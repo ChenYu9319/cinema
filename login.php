@@ -9,9 +9,10 @@
 </head>
 <body class="bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-900 min-h-screen flex items-center justify-center p-4 font-sans antialiased">
 
-    <div class="w-full max-w-md bg-white rounded-2xl border border-white/10 shadow-2xl overflow-hidden backdrop-blur-md">
+    <!-- 登录卡片容器 -->
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
         <!-- 头部 Branding -->
-        <div class="bg-slate-950 p-6 text-center border-b border-indigo-950/50 flex flex-col items-center">
+        <div class="bg-slate-950 p-6 text-center border-b border-indigo-950/40 flex flex-col items-center">
             <div class="w-12 h-12 bg-indigo-900/40 rounded-xl flex items-center justify-center border border-indigo-500/20 mb-3">
                 <i class="fa-solid fa-film text-2xl text-amber-400"></i>
             </div>
@@ -20,39 +21,50 @@
         </div>
 
         <!-- 登录表单 -->
-        <form action="" method="POST" class="p-6 sm:p-8 space-y-4">
+        <form action="dashboard.php" method="POST" class="p-6 sm:p-8 space-y-4">
             
+            <!-- 用户名输入栏 -->
             <div>
-                <label for="username" class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Username or Email</label>
+                <label for="username" class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Username or Email</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
                         <i class="fa-regular fa-user text-sm"></i>
                     </div>
+                    <!-- 圆角已升级至 rounded-xl 并增强环绕阴影反馈 -->
                     <input type="text" id="username" name="username" required placeholder="admin@cinema.com"
-                        class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-hidden focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100 transition">
+                        class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-hidden focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
                 </div>
             </div>
 
+            <!-- 密码输入栏 -->
             <div>
-                <div class="flex justify-between items-center mb-1.5">
-                    <label for="password" class="block text-xs font-bold uppercase tracking-wider text-gray-500">Password</label>
-                </div>
+                <label for="password" class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Password</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
                         <i class="fa-solid fa-lock text-sm"></i>
                     </div>
                     <input type="password" id="password" name="password" required placeholder="••••••••"
-                        class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-hidden focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100 transition">
+                        class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-hidden focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
                 </div>
             </div>
 
-            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2.5 rounded-lg shadow-md hover:shadow-lg flex items-center justify-center space-x-2 transition cursor-pointer mt-2">
+            <!-- 附加交互项：记住我 与 忘记密码 -->
+            <div class="flex items-center justify-between pt-1 text-xs">
+                <label class="flex items-center space-x-2 text-gray-500 cursor-pointer select-none">
+                    <input type="checkbox" name="remember" class="w-4 h-4 rounded-md border-gray-300 text-indigo-600 focus:ring-indigo-500/30 accent-indigo-600">
+                    <span>Remember me</span>
+                </label>
+                <a href="forgot-password.php" class="font-semibold text-indigo-600 hover:text-indigo-700 transition">Forgot Password?</a>
+            </div>
+
+            <!-- 提交登录（样式与后台全局动作按钮对齐） -->
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm py-2.5 rounded-xl shadow-xs hover:shadow-md flex items-center justify-center space-x-2 transition cursor-pointer mt-5">
                 <span>Sign In Account</span>
                 <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
 
             <!-- 注册跳转 -->
-            <div class="text-center pt-2 border-t border-gray-100 mt-6">
+            <div class="text-center pt-4 border-t border-gray-100 mt-6">
                 <p class="text-xs text-gray-500">
                     Don't have an administrator account? 
                     <a href="signup.php" class="font-bold text-indigo-600 hover:text-indigo-700 transition ml-1">Sign Up here</a>

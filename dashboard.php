@@ -65,17 +65,6 @@
                 <h1 class="text-xl font-bold text-gray-900">Dashboard Overview</h1>
                 <p class="text-xs text-gray-500 mt-0.5">Welcome back! Here is what's happening at your cinema today.</p>
             </div>
-            <!-- 已成功注入链接的按钮区 -->
-            <div class="flex items-center space-x-3 w-full sm:w-auto">
-                <a href="login.php" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-xs flex items-center space-x-2 transition cursor-pointer">
-                    <i class="fa-solid fa-plus text-xs"></i>
-                    <span>Login Account</span>
-                </a>
-                <a href="signup.php" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-xs flex items-center space-x-2 transition cursor-pointer">
-                    <i class="fa-solid fa-plus text-xs"></i>
-                    <span>SignUp Account</span>
-                </a>
-            </div>
         </header>
 
         <!-- 核心看板数据网格 -->
