@@ -9,12 +9,21 @@
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 flex h-screen overflow-hidden">
 
-    <!-- 侧边栏导航 -->
-    <aside class="w-64 bg-indigo-950 text-slate-300 flex flex-col justify-between hidden md:flex shrink-0">
+    <!-- 移动端遮罩层：点击可关闭侧边栏 -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-slate-950/40 z-30 hidden md:hidden backdrop-blur-xs transition-opacity duration-300 opacity-0"></div>
+
+    <!-- 侧边栏导航：支持移动端抽屉动画 -->
+    <aside id="sidebar" class="w-64 bg-indigo-950 text-slate-300 flex flex-col justify-between fixed md:relative inset-y-0 left-0 z-40 transform -translate-x-full md:translate-x-0 shrink-0 transition-transform duration-300 ease-in-out border-r border-indigo-900/30">
         <div>
-            <div class="p-5 flex items-center space-x-3 bg-slate-950 border-b border-indigo-900">
-                <i class="fa-solid fa-film text-2xl text-amber-400"></i>
-                <span class="text-xl font-bold tracking-wider text-white">CineManage</span>
+            <div class="p-5 flex items-center justify-between bg-slate-950 border-b border-indigo-900">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-film text-2xl text-amber-400"></i>
+                    <span class="text-xl font-bold tracking-wider text-white">CineManage</span>
+                </div>
+                <!-- 移动端关闭按钮 -->
+                <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white p-1 cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
             <nav class="p-4 space-y-1.5">
                 <a href="dashboard.php" class="flex items-center space-x-3 bg-indigo-900 text-white px-4 py-2.5 rounded-lg font-medium transition">
@@ -44,12 +53,10 @@
             </nav>
         </div>
         <div class="p-4 px-5 border-t border-indigo-900 bg-slate-950/40 flex items-center justify-between shrink-0">
-            <!-- 用户信息区 -->
             <div class="min-w-0 flex-1 pr-3">
                 <p class="text-sm font-semibold text-white truncate">Alan Admin</p>
                 <p class="text-xs text-slate-400 truncate mt-0.5">admin@cinema.com</p>
             </div>
-            <!-- 登出按钮 -->
             <a href="index.php" class="shrink-0 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition" title="Log Out">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
             </a>
@@ -60,58 +67,65 @@
     <div class="flex-1 flex flex-col overflow-y-auto">
         
         <!-- 顶栏头部 -->
-        <header class="bg-white border-b border-gray-200 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
-            <div>
-                <h1 class="text-xl font-bold text-gray-900">Dashboard Overview</h1>
-                <p class="text-xs text-gray-500 mt-0.5">Welcome back! Here is what's happening at your cinema today.</p>
+        <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between gap-4 shrink-0">
+            <div class="flex items-center space-x-3 min-w-0">
+                <!-- 移动端汉堡包唤醒按钮 -->
+                <button id="openSidebarBtn" class="md:hidden p-2 -ml-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition cursor-pointer shrink-0">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                <div class="min-w-0">
+                    <h1 class="text-xl font-bold text-gray-900 truncate">Dashboard Overview</h1>
+                    <p class="text-xs text-gray-500 mt-0.5 truncate">Welcome back! Here is what's happening at your cinema today.</p>
+                </div>
             </div>
         </header>
 
         <!-- 核心看板数据网格 -->
         <main class="p-6 max-w-7xl w-full mx-auto space-y-6">
 
-            <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- 1. 总用户卡片 -> 跳转至用户管理 -->
-                <a href="users.php" class="bg-white p-5 rounded-xl border border-gray-100 shadow-xs flex items-center justify-between hover:shadow-md hover:border-gray-200 transition cursor-pointer">
+            <!-- 核心看板数据网格：已调整为 flex 布局实现自动居中 -->
+            <div class="flex flex-wrap gap-4 justify-center">
+                <!-- 1. 总用户卡片 -->
+                <a href="users.php" class="w-full sm:w-[220px] bg-white p-5 rounded-xl border border-gray-100 shadow-xs flex items-center justify-between hover:shadow-md hover:border-gray-200 transition cursor-pointer">
                     <div>
                         <span class="text-xs font-bold text-gray-400 tracking-wider uppercase block">Total Users</span>
-                        <span class="text-2xl font-black text-gray-900 block mt-1">3</span>
+                        <span class="text-2xl font-black font-mono text-gray-900 block mt-1">3</span>
                     </div>
                     <div class="p-3 bg-blue-50 text-blue-600 rounded-xl shrink-0"><i class="fa-solid fa-users text-lg"></i></div>
                 </a>
 
-                <!-- 2. 电影卡片 -> 跳转至电影管理 -->
-                <a href="movies.php" class="bg-white p-5 rounded-xl border border-gray-100 shadow-xs flex items-center justify-between hover:shadow-md hover:border-gray-200 transition cursor-pointer">
+                <!-- 2. 电影卡片 -->
+                <a href="movies.php" class="w-full sm:w-[220px] bg-white p-5 rounded-xl border border-gray-100 shadow-xs flex items-center justify-between hover:shadow-md hover:border-gray-200 transition cursor-pointer">
                     <div>
                         <span class="text-xs font-bold text-gray-400 tracking-wider uppercase block">Active Movies</span>
-                        <span class="text-2xl font-black text-gray-900 block mt-1">2</span>
+                        <span class="text-2xl font-black font-mono text-gray-900 block mt-1">2</span>
                     </div>
                     <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl shrink-0"><i class="fa-solid fa-video text-lg"></i></div>
                 </a>
 
-                <!-- 3. 影厅卡片 -> 跳转至影厅管理 -->
-                <a href="halls.php" class="bg-white p-5 rounded-xl border border-gray-100 shadow-xs flex items-center justify-between hover:shadow-md hover:border-gray-200 transition cursor-pointer">
+                <!-- 3. 影厅卡片 -->
+                <a href="halls.php" class="w-full sm:w-[220px] bg-white p-5 rounded-xl border border-gray-100 shadow-xs flex items-center justify-between hover:shadow-md hover:border-gray-200 transition cursor-pointer">
                     <div>
                         <span class="text-xs font-bold text-gray-400 tracking-wider uppercase block">Total Halls</span>
-                        <span class="text-2xl font-black text-gray-900 block mt-1">3</span>
+                        <span class="text-2xl font-black font-mono text-gray-900 block mt-1">3</span>
                     </div>
                     <div class="p-3 bg-amber-50 text-amber-600 rounded-xl shrink-0"><i class="fa-solid fa-door-open text-lg"></i></div>
                 </a>
 
-                <!-- 4. 排片卡片 -> 跳转至排片管理 -->
-                <a href="schedules.php" class="bg-white p-5 rounded-xl border border-gray-100 shadow-xs flex items-center justify-between hover:shadow-md hover:border-gray-200 transition cursor-pointer">
+                <!-- 4. 排片卡片 -->
+                <a href="schedules.php" class="w-full sm:w-[220px] bg-white p-5 rounded-xl border border-gray-100 shadow-xs flex items-center justify-between hover:shadow-md hover:border-gray-200 transition cursor-pointerr">
                     <div>
                         <span class="text-xs font-bold text-gray-400 tracking-wider uppercase block">Schedules</span>
-                        <span class="text-2xl font-black text-gray-900 block mt-1">3</span>
+                        <span class="text-2xl font-black font-mono text-gray-900 block mt-1">3</span>
                     </div>
                     <div class="p-3 bg-purple-50 text-purple-600 rounded-xl shrink-0"><i class="fa-solid fa-calendar-days text-lg"></i></div>
                 </a>
 
-                <!-- 5. 订单/票务卡片 -> 跳转至订单管理 -->
-                <a href="bookings.php" class="bg-white p-5 rounded-xl border border-gray-100 shadow-xs col-span-2 lg:col-span-1 flex items-center justify-between hover:shadow-md hover:border-gray-200 transition cursor-pointer">
+                <!-- 5. 订单/票务卡片 -->
+                <a href="bookings.php" class="w-full sm:w-[220px] bg-white p-5 rounded-xl border border-gray-100 shadow-xs flex items-center justify-between hover:shadow-md hover:border-gray-200 transition cursor-pointer">
                     <div>
                         <span class="text-xs font-bold text-gray-400 tracking-wider uppercase block">Total Tickets</span>
-                        <span class="text-2xl font-black text-gray-900 block mt-1">2</span>
+                        <span class="text-2xl font-black font-mono text-gray-900 block mt-1">2</span>
                     </div>
                     <div class="p-3 bg-rose-50 text-rose-600 rounded-xl shrink-0"><i class="fa-solid fa-ticket text-lg"></i></div>
                 </a>
@@ -139,6 +153,7 @@
                                 </tr>
                             </thead>
                             <tbody class="text-sm divide-y divide-gray-100">
+                                <!-- 示例数据行 -->
                                 <tr class="hover:bg-slate-50/80 transition">
                                     <td class="py-3.5 px-5">
                                         <div class="font-semibold text-gray-900">Interstellar</div>
@@ -149,9 +164,10 @@
                                         <span class="inline-block text-[10px] font-bold tracking-wider uppercase bg-amber-50 text-amber-700 border border-amber-200/60 rounded px-1.5 mt-0.5">imax</span>
                                     </td>
                                     <td class="py-3.5 px-5">
-                                        <div class="text-gray-600 text-xs">2026-06-15</div>
+                                        <div class="text-gray-600 text-xs font-mono">2026-06-15</div>
                                         <div class="font-mono text-indigo-600 font-bold mt-0.5">14:30:00</div>
                                     </td>
+                                </tr>
                                 </tr>
                                 <tr class="hover:bg-slate-50/80 transition">
                                     <td class="py-3.5 px-5">
@@ -163,7 +179,7 @@
                                         <span class="inline-block text-[10px] font-bold tracking-wider uppercase bg-amber-50 text-amber-700 border border-amber-200/60 rounded px-1.5 mt-0.5">imax</span>
                                     </td>
                                     <td class="py-3.5 px-5">
-                                        <div class="text-gray-600 text-xs">2026-06-15</div>
+                                        <div class="text-gray-600 text-xs font-mono">2026-06-15</div>
                                         <div class="font-mono text-indigo-600 font-bold mt-0.5">19:00:00</div>
                                     </td>
                                 </tr>
@@ -177,7 +193,7 @@
                                         <span class="inline-block text-[10px] font-bold tracking-wider uppercase bg-blue-50 text-blue-700 border border-blue-200/60 rounded px-1.5 mt-0.5">standard</span>
                                     </td>
                                     <td class="py-3.5 px-5">
-                                        <div class="text-gray-600 text-xs">2026-06-16</div>
+                                        <div class="text-gray-600 text-xs font-mono">2026-06-16</div>
                                         <div class="font-mono text-indigo-600 font-bold mt-0.5">10:00:00</div>
                                     </td>
                                 </tr>
@@ -234,10 +250,34 @@
                         View All Booking History
                     </a>
                 </div>
-
             </div>
         </main>
     </div>
 
+    <!-- 💡 新增：移动端菜单控制 JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const openBtn = document.getElementById('openSidebarBtn');
+            const closeBtn = document.getElementById('closeSidebarBtn');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            function toggleSidebar(isOpen) {
+                if (isOpen) {
+                    sidebar.classList.remove('-translate-x-full');
+                    overlay.classList.remove('hidden');
+                    setTimeout(() => overlay.classList.add('opacity-100'), 20);
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.remove('opacity-100');
+                    setTimeout(() => overlay.classList.add('hidden'), 300);
+                }
+            }
+
+            openBtn?.addEventListener('click', () => toggleSidebar(true));
+            closeBtn?.addEventListener('click', () => toggleSidebar(false));
+            overlay?.addEventListener('click', () => toggleSidebar(false));
+        });
+    </script>
 </body>
 </html>

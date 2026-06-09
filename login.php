@@ -48,15 +48,6 @@
                 </div>
             </div>
 
-            <!-- 附加交互项：记住我 与 忘记密码 -->
-            <div class="flex items-center justify-between pt-1 text-xs">
-                <label class="flex items-center space-x-2 text-gray-500 cursor-pointer select-none">
-                    <input type="checkbox" name="remember" class="w-4 h-4 rounded-md border-gray-300 text-indigo-600 focus:ring-indigo-500/30 accent-indigo-600">
-                    <span>Remember me</span>
-                </label>
-                <a href="forgot-password.php" class="font-semibold text-indigo-600 hover:text-indigo-700 transition">Forgot Password?</a>
-            </div>
-
             <!-- 提交登录（样式与后台全局动作按钮对齐） -->
             <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm py-2.5 rounded-xl shadow-xs hover:shadow-md flex items-center justify-center space-x-2 transition cursor-pointer mt-5">
                 <span>Sign In Account</span>

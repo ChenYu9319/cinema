@@ -66,6 +66,19 @@
                 </div>
             </div>
 
+            <!-- 原有的 Password 下面添加这一段 -->
+            <div>
+                <label for="confirm_password" class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Confirm Password</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                        <i class="fa-solid fa-lock text-sm"></i>
+                    </div>
+                    <input type="password" id="confirm_password" name="confirm_password" required placeholder="••••••••"
+                        class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-hidden focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100 transition">
+                </div>
+                <p id="password-error" class="text-[10px] text-red-500 mt-1 hidden font-semibold">Passwords do not match!</p>
+            </div>
+
             <!-- Submit Button -->
             <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2.5 rounded-lg shadow-md hover:shadow-lg flex items-center justify-center space-x-2 transition cursor-pointer mt-2">
                 <span>Create Account</span>
@@ -82,5 +95,28 @@
         </form>
     </div>
 
+    <script>
+    const form = document.querySelector('form');
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirm_password');
+    const errorMsg = document.getElementById('password-error');
+
+    form.addEventListener('submit', function(e) {
+        if (password.value !== confirmPassword.value) {
+            e.preventDefault(); // 阻止表单提交
+            errorMsg.classList.remove('hidden');
+            confirmPassword.classList.add('border-red-500', 'ring-1', 'ring-red-200');
+        } else {
+            errorMsg.classList.add('hidden');
+            confirmPassword.classList.remove('border-red-500', 'ring-1', 'ring-red-200');
+        }
+    });
+
+    // 当用户开始输入时，自动隐藏错误提示
+    confirmPassword.addEventListener('input', () => {
+        errorMsg.classList.add('hidden');
+        confirmPassword.classList.remove('border-red-500', 'ring-1', 'ring-red-200');
+    });
+</script>
 </body>
 </html>

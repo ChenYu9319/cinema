@@ -57,7 +57,7 @@
     <!-- 主内容区 -->
     <div class="flex-1 flex flex-col overflow-y-auto">
         
-        <!-- 顶栏头部 -->
+        <!-- 顶栏头部（已补齐右侧 Back to List 按钮，保持系统设计一致性） -->
         <header class="bg-white border-b border-gray-200 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
             <div>
                 <div class="flex items-center space-x-2 text-xs text-gray-400 font-medium mb-1">
@@ -68,12 +68,18 @@
                 <h1 class="text-xl font-bold text-gray-900">Edit User Profile</h1>
                 <p class="text-xs text-gray-500 mt-0.5">Modify database preferences and systemic settings for this profile.</p>
             </div>
+            
+            <a href="users.php" class="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold px-4 py-2.5 rounded-xl shadow-xs transition text-center shrink-0 flex items-center space-x-2">
+                <i class="fa-solid fa-arrow-left text-xs"></i>
+                <span>Back to List</span>
+            </a>
         </header>
 
         <!-- 表单区 -->
         <main class="p-6 max-w-3xl w-full mx-auto space-y-6">
             <div class="bg-white rounded-xl border border-gray-100 shadow-xs p-6">
-                <form action="" method="POST" class="space-y-5">
+                <!-- 这里的 action 在实际开发中可以留空或指向自身处理程序 -->
+                <form action="users.php" method="POST" class="space-y-5">
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
@@ -108,7 +114,8 @@
 
                     <!-- 操作与跳转控制 -->
                     <div class="pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <a href="user-cdw.php" class="text-xs font-bold text-amber-600 hover:text-amber-700 flex items-center space-x-1.5 transition">
+                        <!-- ✅ 已修复死链：改为指向带有用户名传参的 user-edit-cdw.php -->
+                        <a href="user-edit-cdw.php?username=user_bob" class="text-xs font-bold text-amber-600 hover:text-amber-700 flex items-center space-x-1.5 transition">
                             <i class="fa-solid fa-key text-[10px]"></i>
                             <span>Need to change user password instead?</span>
                         </a>

@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineManage Pro - Change Password</title>
+    <title>CineManage Pro - Edit Credentials</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 flex h-screen overflow-hidden">
 
-    <!-- 侧边栏导航 -->
+    <!-- 侧边栏导航（保持全局一致，Users 高亮） -->
     <aside class="w-64 bg-indigo-950 text-slate-300 flex flex-col justify-between hidden md:flex shrink-0">
         <div>
             <div class="p-5 flex items-center space-x-3 bg-slate-950 border-b border-indigo-900">
@@ -57,55 +57,90 @@
     <!-- 主内容区 -->
     <div class="flex-1 flex flex-col overflow-y-auto">
         
-        <!-- 顶栏头部 -->
+        <!-- 头部顶栏 -->
         <header class="bg-white border-b border-gray-200 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
             <div>
                 <div class="flex items-center space-x-2 text-xs text-gray-400 font-medium mb-1">
+                    <span>System</span>
+                    <span>/</span>
                     <a href="users.php" class="hover:text-indigo-600 transition">Users</a>
                     <span>/</span>
-                    <span class="text-gray-600">Change Password</span>
+                    <span class="text-gray-600">Edit Credentials</span>
                 </div>
-                <h1 class="text-xl font-bold text-gray-900">Security Credentials</h1>
-                <p class="text-xs text-gray-500 mt-0.5">Force modify or reset secure access parameters for this client.</p>
+                <h1 class="text-xl font-bold text-gray-900">Change User Password</h1>
+                <p class="text-xs text-gray-500 mt-0.5">Update account passwords and access permissions safely.</p>
             </div>
+            
+            <!-- 返回列表按钮 -->
+            <a href="users.php" class="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold px-4 py-2.5 rounded-xl shadow-xs transition text-center shrink-0 flex items-center space-x-2">
+                <i class="fa-solid fa-arrow-left text-xs"></i>
+                <span>Back to List</span>
+            </a>
         </header>
 
-        <!-- 表单区 -->
-        <main class="p-6 max-w-xl w-full mx-auto space-y-6">
-            <div class="bg-white rounded-xl border border-gray-100 shadow-xs p-6">
-                
-                <!-- 警告框提示 -->
-                <div class="mb-5 p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl flex items-start space-x-3 text-xs leading-relaxed">
-                    <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm mt-0.5 shrink-0"></i>
-                    <div>
-                        <strong class="font-bold">Security Notice:</strong> Re-assigning security credentials overwrites current active keys immediately. Make sure to notify the account holder once processed.
-                    </div>
+        <!-- 表单主体区 -->
+        <main class="p-6 max-w-3xl w-full mx-auto">
+            <div class="bg-white rounded-xl border border-gray-100 shadow-xs overflow-hidden">
+                <div class="p-6 sm:p-8 border-b border-gray-50 bg-gray-50/50">
+                    <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wider flex items-center space-x-2">
+                        <i class="fa-solid fa-shield-halved text-indigo-600"></i>
+                        <span>Security Credentials Info</span>
+                    </h2>
                 </div>
 
-                <form action="" method="POST" class="space-y-5">
+                <form action="users.php" method="POST" class="p-6 sm:p-8 space-y-5">
                     
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-2">New Password</label>
-                        <input type="password" name="new_password" required placeholder="••••••••" 
-                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-hidden focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
+                    <!-- 账号只读展示（明确当前修改的是谁） -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Target Username</label>
+                            <input type="text" value="user_bob" readonly 
+                                class="w-full px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-xl text-sm text-gray-500 cursor-not-allowed font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Target Email</label>
+                            <input type="text" value="bob@example.com" readonly 
+                                class="w-full px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-xl text-sm text-gray-500 cursor-not-allowed font-medium">
+                        </div>
                     </div>
 
+                    <hr class="border-gray-100 my-2">
+
+                    <!-- 新密码输入框 -->
                     <div>
-                        <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-2">Confirm New Password</label>
-                        <input type="password" name="confirm_password" required placeholder="••••••••" 
-                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-hidden focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
+                        <label for="new_password" class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Set New Password</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                                <i class="fa-solid fa-lock text-sm"></i>
+                            </div>
+                            <input type="password" id="new_password" name="new_password" required placeholder="Enter new strong password"
+                                class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-hidden focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
+                        </div>
+                        <p class="text-[11px] text-gray-400 mt-1.5">Recommended: Use at least 8 characters with a mix of letters and numbers.</p>
                     </div>
 
-                    <!-- 操作按钮 -->
-                    <div class="pt-4 border-t border-gray-100 flex items-center justify-end space-x-3">
-                        <a href="users.php" class="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-50 transition">
+                    <!-- 确认新密码 -->
+                    <div>
+                        <label for="confirm_password" class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Confirm New Password</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                                <i class="fa-solid fa-circle-check text-sm"></i>
+                            </div>
+                            <input type="password" id="confirm_password" name="confirm_password" required placeholder="Repeat the new password"
+                                class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-hidden focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
+                        </div>
+                    </div>
+
+                    <!-- 底端动作按钮 -->
+                    <div class="flex items-center justify-end space-x-3 pt-4 border-t border-gray-100 mt-8">
+                        <a href="users.php" class="px-4 py-2.5 border border-gray-200 hover:bg-gray-50 text-gray-600 text-sm font-semibold rounded-xl transition text-center">
                             Cancel
                         </a>
-                        <button type="submit" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-sm font-semibold shadow-xs hover:shadow-md transition cursor-pointer">
-                            Update Credentials
+                        <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-xs hover:shadow-md transition cursor-pointer flex items-center space-x-2">
+                            <i class="fa-solid fa-save text-xs"></i>
+                            <span>Save New Password</span>
                         </button>
                     </div>
-
                 </form>
             </div>
         </main>
