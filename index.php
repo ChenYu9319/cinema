@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,14 +46,23 @@
 
         <!-- Action Buttons -->
         <div class="flex flex-col gap-3 pt-2">
-            <a href="login.php" class="w-full px-6 py-4 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white rounded-2xl transition shadow-lg flex items-center justify-center space-x-2 font-semibold text-sm">
-                <i class="fa-solid fa-right-to-bracket text-xs"></i>
-                <span>Sign In to Your Account</span>
-            </a>
-            <a href="signup.php" class="w-full px-6 py-4 bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-[0.98] rounded-2xl transition flex items-center justify-center space-x-2 font-medium text-sm border border-slate-700">
-                <i class="fa-solid fa-user-plus text-xs"></i>
-                <span>Create New Account</span>
-            </a>
+            <?php if(isset($_SESSION['user'])): ?>
+                <!-- 如果已登录，显示 Dashboard 按钮 -->
+                <a href="dashboard.php" class="w-full px-6 py-4 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-white rounded-2xl transition shadow-lg flex items-center justify-center space-x-2 font-semibold text-sm">
+                    <i class="fa-solid fa-gauge-high text-xs"></i>
+                    <span>Go to Dashboard</span>
+                </a>
+            <?php else: ?>
+                <!-- 如果未登录，显示登录和注册按钮 -->
+                <a href="login-form.php" class="w-full px-6 py-4 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white rounded-2xl transition shadow-lg flex items-center justify-center space-x-2 font-semibold text-sm">
+                    <i class="fa-solid fa-right-to-bracket text-xs"></i>
+                    <span>Sign In to Your Account</span>
+                </a>
+                <a href="signup.php" class="w-full px-6 py-4 bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-[0.98] rounded-2xl transition flex items-center justify-center space-x-2 font-medium text-sm border border-slate-700">
+                    <i class="fa-solid fa-user-plus text-xs"></i>
+                    <span>Create New Account</span>
+                </a>
+            <?php endif; ?>
         </div>
 
         <!-- Footer -->

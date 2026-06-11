@@ -61,8 +61,6 @@
         <header class="bg-white border-b border-gray-200 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
             <div>
                 <div class="flex items-center space-x-2 text-xs text-gray-400 font-medium mb-1">
-                    <span>System</span>
-                    <span>/</span>
                     <a href="users.php" class="hover:text-indigo-600 transition">Users</a>
                     <span>/</span>
                     <span class="text-gray-600">Edit Credentials</span>

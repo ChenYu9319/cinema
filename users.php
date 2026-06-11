@@ -110,15 +110,32 @@
                                     <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200/50 tracking-wider">admin</span>
                                 </td>
                                 <td class="py-4 px-5 text-right space-x-3">
-                                    <!-- 链接已更改为 user-edit.php -->
-                                    <a href="user-edit.php?username=admin_alan&email=admin@cinema.com" class="text-indigo-600 hover:text-indigo-900 font-semibold text-xs inline-flex items-center space-x-1 transition">
-                                        <i class="fa-solid fa-pen text-[10px]"></i>
-                                        <span>Edit</span>
-                                    </a>
-                                    <button onclick="return confirm('Are you sure you want to delete this user?');" class="text-rose-600 hover:text-rose-900 font-semibold text-xs inline-flex items-center space-x-1 transition cursor-pointer">
-                                        <i class="fa-solid fa-trash text-[10px]"></i>
-                                        <span>Delete</span>
-                                    </button>
+                                    <!-- 1. Edit Action (POST) -->
+                                    <form action="user-edit.php" method="POST" class="inline-block">
+                                        <input type="hidden" name="username" value="admin_alan">
+                                        <button type="submit" class="text-indigo-600 hover:text-indigo-900 font-semibold text-xs inline-flex items-center space-x-1 transition cursor-pointer">
+                                            <i class="fa-solid fa-pen text-[10px]"></i>
+                                            <span>Edit</span>
+                                        </button>
+                                    </form>
+
+                                    <!-- 2. Reset Password Action (POST) -->
+                                    <form action="user-edit-cdw.php" method="POST" class="inline-block">
+                                        <input type="hidden" name="username" value="admin_alan">
+                                        <button type="submit" class="text-sky-600 hover:text-sky-900 font-semibold text-xs inline-flex items-center space-x-1 transition cursor-pointer">
+                                            <i class="fa-solid fa-key text-[10px]"></i>
+                                            <span>Reset PW</span>
+                                        </button>
+                                    </form>
+
+                                    <!-- 3. Delete Action (POST) -->
+                                    <form method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                        <input type="hidden" name="username" value="admin_alan">
+                                        <button type="submit" class="text-rose-600 hover:text-rose-900 font-semibold text-xs inline-flex items-center space-x-1 transition cursor-pointer">
+                                            <i class="fa-solid fa-trash text-[10px]"></i>
+                                            <span>Delete</span>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                             <!-- 用户行 #02 -->
@@ -130,15 +147,32 @@
                                     <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200/50 tracking-wider">user</span>
                                 </td>
                                 <td class="py-4 px-5 text-right space-x-3">
-                                    <!-- 链接已更改为 user-edit.php -->
-                                    <a href="user-edit.php?username=user_bob&email=bob@example.com" class="text-indigo-600 hover:text-indigo-900 font-semibold text-xs inline-flex items-center space-x-1 transition">
-                                        <i class="fa-solid fa-pen text-[10px]"></i>
-                                        <span>Edit</span>
-                                    </a>
-                                    <button onclick="return confirm('Are you sure you want to delete this user?');" class="text-rose-600 hover:text-rose-900 font-semibold text-xs inline-flex items-center space-x-1 transition cursor-pointer">
-                                        <i class="fa-solid fa-trash text-[10px]"></i>
-                                        <span>Delete</span>
-                                    </button>
+                                    <!-- 1. Edit Action (POST) -->
+                                    <form action="user-edit.php" method="POST" class="inline-block">
+                                        <input type="hidden" name="username" value="admin_alan">
+                                        <button type="submit" class="text-indigo-600 hover:text-indigo-900 font-semibold text-xs inline-flex items-center space-x-1 transition cursor-pointer">
+                                            <i class="fa-solid fa-pen text-[10px]"></i>
+                                            <span>Edit</span>
+                                        </button>
+                                    </form>
+
+                                    <!-- 2. Reset Password Action (POST) -->
+                                    <form action="user-edit-cdw.php" method="POST" class="inline-block">
+                                        <input type="hidden" name="username" value="admin_alan">
+                                        <button type="submit" class="text-sky-600 hover:text-sky-900 font-semibold text-xs inline-flex items-center space-x-1 transition cursor-pointer">
+                                            <i class="fa-solid fa-key text-[10px]"></i>
+                                            <span>Reset PW</span>
+                                        </button>
+                                    </form>
+
+                                    <!-- 3. Delete Action (POST) -->
+                                    <form method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                        <input type="hidden" name="username" value="admin_alan">
+                                        <button type="submit" class="text-rose-600 hover:text-rose-900 font-semibold text-xs inline-flex items-center space-x-1 transition cursor-pointer">
+                                            <i class="fa-solid fa-trash text-[10px]"></i>
+                                            <span>Delete</span>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                             <!-- 用户行 #03 -->
@@ -150,15 +184,32 @@
                                     <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200/50 tracking-wider">user</span>
                                 </td>
                                 <td class="py-4 px-5 text-right space-x-3">
-                                    <!-- 链接已更改为 user-edit.php -->
-                                    <a href="user-edit.php?username=user_charlie&email=charlie@example.com" class="text-indigo-600 hover:text-indigo-900 font-semibold text-xs inline-flex items-center space-x-1 transition">
-                                        <i class="fa-solid fa-pen text-[10px]"></i>
-                                        <span>Edit</span>
-                                    </a>
-                                    <button onclick="return confirm('Are you sure you want to delete this user?');" class="text-rose-600 hover:text-rose-900 font-semibold text-xs inline-flex items-center space-x-1 transition cursor-pointer">
-                                        <i class="fa-solid fa-trash text-[10px]"></i>
-                                        <span>Delete</span>
-                                    </button>
+                                    <!-- 1. Edit Action (POST) -->
+                                    <form action="user-edit.php" method="POST" class="inline-block">
+                                        <input type="hidden" name="username" value="admin_alan">
+                                        <button type="submit" class="text-indigo-600 hover:text-indigo-900 font-semibold text-xs inline-flex items-center space-x-1 transition cursor-pointer">
+                                            <i class="fa-solid fa-pen text-[10px]"></i>
+                                            <span>Edit</span>
+                                        </button>
+                                    </form>
+
+                                    <!-- 2. Reset Password Action (POST) -->
+                                    <form action="user-edit-cdw.php" method="POST" class="inline-block">
+                                        <input type="hidden" name="username" value="admin_alan">
+                                        <button type="submit" class="text-sky-600 hover:text-sky-900 font-semibold text-xs inline-flex items-center space-x-1 transition cursor-pointer">
+                                            <i class="fa-solid fa-key text-[10px]"></i>
+                                            <span>Reset PW</span>
+                                        </button>
+                                    </form>
+
+                                    <!-- 3. Delete Action (POST) -->
+                                    <form method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                        <input type="hidden" name="username" value="admin_alan">
+                                        <button type="submit" class="text-rose-600 hover:text-rose-900 font-semibold text-xs inline-flex items-center space-x-1 transition cursor-pointer">
+                                            <i class="fa-solid fa-trash text-[10px]"></i>
+                                            <span>Delete</span>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         </tbody>

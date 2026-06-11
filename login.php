@@ -1,68 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineManage Pro - Login</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body class="bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-900 min-h-screen flex items-center justify-center p-4 font-sans antialiased">
+<?php
+session_start();
 
-    <!-- 登录卡片容器 -->
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
-        <!-- 头部 Branding -->
-        <div class="bg-slate-950 p-6 text-center border-b border-indigo-950/40 flex flex-col items-center">
-            <div class="w-12 h-12 bg-indigo-900/40 rounded-xl flex items-center justify-center border border-indigo-500/20 mb-3">
-                <i class="fa-solid fa-film text-2xl text-amber-400"></i>
-            </div>
-            <h1 class="text-xl font-bold text-white tracking-wider">CineManage Pro</h1>
-            <p class="text-xs text-slate-400 mt-1">Sign in to control your cinema management portal</p>
-        </div>
+// 1. 如果已经登录，直接进后台主页
+if(isset($_SESSION['user'])){
+    header("Location: dashboard.php");
+    exit();
+}
 
-        <!-- 登录表单 -->
-        <form action="dashboard.php" method="POST" class="p-6 sm:p-8 space-y-4">
+$username = isset($_POST['username']) ? $_POST['username'] : null;
+$password = isset($_POST['password']) ? $_POST['password'] : null;
+
+// 2. 接收前端表单发送过来的 username 和 password
+if(isset($_POST['username'])){
+
+    try {
+        // 连接数据库
+        $db = new PDO("mysql:host=localhost;dbname=cinema", "root", "");
+        // 设置 PDO 错误模式为异常，方便捕获而非直接崩溃泄露路径
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        // 使用 username 进行安全预处理查询
+        $query = "SELECT * FROM users WHERE username = :username";
+        $stmt = $db->prepare($query);
+        $stmt->execute([':username' => $username]);
+        $users = $stmt->fetchAll();
+
+        // 💡 优化：时间差防御。如果用户不存在，虚构一个假的哈希进行比对，消耗掉相同的时间
+        $userExists = count($users) > 0;
+        $dbPassword = $userExists ? $users[0]['password'] : '$2y$10$abcdefghijklmnopqrstuv'; 
+
+        // 验证密码
+        if(password_verify($password, $dbPassword) && $userExists){
             
-            <!-- 用户名输入栏 -->
-            <div>
-                <label for="username" class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Username or Email</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                        <i class="fa-regular fa-user text-sm"></i>
-                    </div>
-                    <!-- 圆角已升级至 rounded-xl 并增强环绕阴影反馈 -->
-                    <input type="text" id="username" name="username" required placeholder="admin@cinema.com"
-                        class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-hidden focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
-                </div>
-            </div>
+            // 💡 修复漏洞 1：防御会话固定漏洞！登录成功瞬间销毁旧 ID，生成全新的 Session ID
+            session_regenerate_id(true);
 
-            <!-- 密码输入栏 -->
-            <div>
-                <label for="password" class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Password</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                        <i class="fa-solid fa-lock text-sm"></i>
-                    </div>
-                    <input type="password" id="password" name="password" required placeholder="••••••••"
-                        class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-hidden focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
-                </div>
-            </div>
+            // 💡 修复漏洞 3：擦除敏感数据。保护 Session 内存安全，不存放密码哈希
+            $userData = $users[0];
+            unset($userData['password']); 
 
-            <!-- 提交登录（样式与后台全局动作按钮对齐） -->
-            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm py-2.5 rounded-xl shadow-xs hover:shadow-md flex items-center justify-center space-x-2 transition cursor-pointer mt-5">
-                <span>Sign In Account</span>
-                <i class="fa-solid fa-arrow-right text-xs"></i>
-            </button>
+            $_SESSION['user'] = $userData;
+            header("Location: dashboard.php");
+            exit();
+        } else {
+            // 失败则带上 error 参数弹回登录页
+            header("Location: login-form.php?error=1");
+            exit();
+        }
 
-            <!-- 注册跳转 -->
-            <div class="text-center pt-4 border-t border-gray-100 mt-6">
-                <p class="text-xs text-gray-500">
-                    Don't have an administrator account? 
-                    <a href="signup.php" class="font-bold text-indigo-600 hover:text-indigo-700 transition ml-1">Sign Up here</a>
-                </p>
-            </div>
-        </form>
-    </div>
+    } catch (PDOException $e) {
+        // 💡 修复漏洞 4：捕获异常，防止直接在前端打印出数据库账号密码和路径
+        // 实际开发中可以记录到 error_log，给前端展示一个模糊的错误提示即可
+        header("Location: login-form.php?error=1");
+        exit();
+    }
+}
 
-</body>
-</html>
+// 如果不是 POST 提交，直接退回登录页
+header("Location: login-form.php");
+exit();
+?>

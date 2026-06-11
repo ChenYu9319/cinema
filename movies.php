@@ -1,3 +1,46 @@
+<?php
+// ================= 1. 建立数据库连接 =================
+try {
+    $db = new PDO("mysql:host=localhost;dbname=cinema", "root", "");
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+
+// ================= 2. 处理表单提交 (新增电影) =================
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // 获取表单数据，严格对应你的表字段
+    $title         = $_POST['title'] ?? '';
+    $description   = $_POST['description'] ?? '';
+    $director_name = $_POST['director_name'] ?? '';
+    $release_date  = $_POST['release_date'] ?? '';
+    $end_date      = $_POST['end_date'] ?? '';
+    $duration      = $_POST['duration'] ?? 0;
+
+    if (!empty($title)) {
+        try {
+            // 只保留你指定的 6 个插入字段（id 为自增）
+            $sql = "INSERT INTO movies (title, description, director_name, release_date, end_date, duration) 
+                    VALUES (?, ?, ?, ?, ?, ?)";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([$title, $description, $director_name, $release_date, $end_date, $duration]);
+            
+            header("Location: movies.php");
+            exit;
+        } catch (PDOException $e) {
+            echo "<script>alert('Error saving record: " . addslashes($e->getMessage()) . "');</script>";
+        }
+    }
+}
+
+// ================= 3. 读取电影列表 =================
+try {
+    $query = $db->query("SELECT * FROM movies ORDER BY id DESC");
+    $movies = $query->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Query failed: " . $e->getMessage());
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,23 +52,23 @@
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 flex h-screen overflow-hidden">
 
-    <!-- 侧边栏导航 (修复：增加 ID 和移动端样式) -->
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-indigo-950 text-slate-300 flex flex-col justify-between transform -translate-x-full transition-transform duration-300 md:relative md:translate-x-0 shrink-0">
+    <!-- 侧边栏导航 -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-indigo-950 text-slate-300 flex flex-col justify-between transform -translate-x-full transition-transform duration-300 md:relative md:translate-x-0 shrink-0 border-r border-indigo-900/30">
         <div>
             <div class="p-5 flex items-center justify-between bg-slate-950 border-b border-indigo-900">
                 <div class="flex items-center space-x-3">
                     <i class="fa-solid fa-film text-2xl text-amber-400"></i>
                     <span class="text-xl font-bold tracking-wider text-white">CineManage</span>
                 </div>
-                <!-- 移动端关闭按钮 -->
-                <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white p-2 cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
             <nav class="p-4 space-y-1.5">
                 <a href="dashboard.php" class="flex items-center space-x-3 hover:bg-indigo-900/50 hover:text-white px-4 py-2.5 rounded-lg font-medium transition">
                     <i class="fa-solid fa-chart-pie w-5 text-center text-slate-400"></i>
                     <span>Dashboard</span>
                 </a>
-                <!-- ✨ 当前激活项切换为 Movies -->
                 <a href="movies.php" class="flex items-center space-x-3 bg-indigo-900 text-white px-4 py-2.5 rounded-lg font-medium transition">
                     <i class="fa-solid fa-video w-5 text-center text-amber-400"></i>
                     <span>Movies</span>
@@ -47,23 +90,22 @@
                     <span>Users</span>
                 </a>
             </nav>
-            </nav>
         </div>
         <div class="p-4 px-5 border-t border-indigo-900 bg-slate-950/40 flex items-center justify-between shrink-0">
             <p class="text-sm font-semibold text-white truncate">Alan Admin</p>
-            <a href="index.php" class="text-slate-400 hover:text-rose-500"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+            <a href="index.php" class="text-slate-400 hover:text-rose-500 transition"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
         </div>
     </aside>
 
-    <!-- 遮罩层 (修复：增加此元素以支持移动端点击空白关闭) -->
-    <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 z-40 hidden opacity-0 transition-opacity duration-300 md:hidden"></div>
+    <!-- 移动端侧边栏遮罩层 -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-slate-950/40 z-40 hidden opacity-0 transition-opacity duration-300 md:hidden backdrop-blur-xs"></div>
 
     <!-- 主内容区 -->
     <div class="flex-1 flex flex-col overflow-y-auto">
         <!-- 顶栏 -->
         <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shrink-0">
             <div class="flex items-center space-x-4">
-                <button id="openSidebarBtn" class="md:hidden text-gray-500 hover:text-indigo-600">
+                <button id="openSidebarBtn" class="md:hidden text-gray-500 hover:text-indigo-600 p-1 rounded-lg hover:bg-gray-100 transition cursor-pointer">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
                 <div>
@@ -83,78 +125,68 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-gray-50/70 text-gray-500 text-xs font-bold uppercase tracking-wider border-b border-gray-100">
-                                <th class="py-3 px-5">Movie Info</th>
-                                <th class="py-3 px-5">Genre</th>
+                                <th class="py-3 px-5">Movie Title</th>
+                                <th class="py-3 px-5">Director</th>
                                 <th class="py-3 px-5">Duration</th>
                                 <th class="py-3 px-5">Release Date</th>
-                                <th class="py-3 px-5">Status</th>
+                                <th class="py-3 px-5">End Date</th>
+                                <th class="py-3 px-5">Description</th>
                                 <th class="py-3 px-5 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm divide-y divide-gray-100">
-                            <!-- 电影 1 -->
-                            <tr class="hover:bg-slate-50/80 transition">
-                                <td class="py-3.5 px-5">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-9 h-12 bg-slate-200 rounded-lg flex items-center justify-center text-slate-400 shrink-0 border border-gray-100 overflow-hidden">
-                                            <i class="fa-solid fa-image text-xs"></i>
-                                        </div>
-                                        <div>
-                                            <p class="font-semibold text-gray-900">Inception</p>
-                                            <p class="text-xs text-gray-400 mt-0.5">ID: #MOV-001</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-3.5 px-5">
-                                    <span class="text-xs font-mono uppercase bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md border border-blue-200/50 font-semibold">Sci-Fi</span>
-                                </td>
-                                <td class="py-3.5 px-5 text-gray-600 font-medium">148 Mins</td>
-                                <td class="py-3.5 px-5 text-gray-500 text-xs">2010-07-16</td>
-                                <td class="py-3.5 px-5">
-                                    <span class="inline-flex items-center space-x-1.5 text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/50 font-medium">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                        <span>Now Showing</span>
-                                    </span>
-                                </td>
-                                <td class="py-3.5 px-5 text-right">
-                                    <a href="movies-edit.php?id=1" class="inline-flex items-center space-x-1 text-indigo-600 hover:text-indigo-900 font-semibold text-xs transition">
-                                        <i class="fa-solid fa-pen-to-square text-[10px]"></i>
-                                        <span>Edit</span>
-                                    </a>
-                                </td>
-                            </tr>
-                            
-                            <!-- 电影 2 -->
-                            <tr class="hover:bg-slate-50/80 transition">
-                                <td class="py-3.5 px-5">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-9 h-12 bg-slate-200 rounded-lg flex items-center justify-center text-slate-400 shrink-0 border border-gray-100 overflow-hidden">
-                                            <i class="fa-solid fa-image text-xs"></i>
-                                        </div>
-                                        <div>
-                                            <p class="font-semibold text-gray-900">Avatar: The Way of Water</p>
-                                            <p class="text-xs text-gray-400 mt-0.5">ID: #MOV-002</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-3.5 px-5">
-                                    <span class="text-xs font-mono uppercase bg-purple-50 text-purple-700 px-2 py-0.5 rounded-md border border-purple-200/50 font-semibold">Action</span>
-                                </td>
-                                <td class="py-3.5 px-5 text-gray-600 font-medium">192 Mins</td>
-                                <td class="py-3.5 px-5 text-gray-500 text-xs">2022-12-16</td>
-                                <td class="py-3.5 px-5">
-                                    <span class="inline-flex items-center space-x-1.5 text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/50 font-medium">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                                        <span>Coming Soon</span>
-                                    </span>
-                                </td>
-                                <td class="py-3.5 px-5 text-right">
-                                    <a href="movies-edit.php?id=2" class="inline-flex items-center space-x-1 text-indigo-600 hover:text-indigo-900 font-semibold text-xs transition">
-                                        <i class="fa-solid fa-pen-to-square text-[10px]"></i>
-                                        <span>Edit</span>
-                                    </a>
-                                </td>
-                            </tr>
+                            <?php if (empty($movies)): ?>
+                                <tr>
+                                    <td colspan="7" class="py-8 text-center text-gray-400 font-medium">
+                                        <i class="fa-solid fa-inbox block text-2xl mb-2 text-gray-300"></i>
+                                        No movies found. Click "Add New Movie" to get started!
+                                    </td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($movies as $movie): ?>
+                                    <tr class="hover:bg-slate-50/80 transition">
+                                        <!-- 电影标题与 ID -->
+                                        <td class="py-3.5 px-5">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="w-9 h-12 bg-slate-200 rounded-lg flex items-center justify-center text-slate-400 shrink-0 border border-gray-100 overflow-hidden">
+                                                    <i class="fa-solid fa-image text-xs"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="font-semibold text-gray-900"><?= htmlspecialchars($movie['title']) ?></p>
+                                                    <p class="text-xs text-gray-400 mt-0.5">ID: #MOV-<?= str_pad($movie['id'], 3, '0', STR_PAD_LEFT) ?></p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <!-- 导演 -->
+                                        <td class="py-3.5 px-5 text-gray-700 font-medium">
+                                            <?= htmlspecialchars($movie['director_name']) ?>
+                                        </td>
+                                        <!-- 时长 -->
+                                        <td class="py-3.5 px-5 text-gray-600 font-mono">
+                                            <?= htmlspecialchars($movie['duration']) ?> Mins
+                                        </td>
+                                        <!-- 上映日期 -->
+                                        <td class="py-3.5 px-5 text-gray-500 text-xs">
+                                            <?= htmlspecialchars($movie['release_date']) ?>
+                                        </td>
+                                        <!-- 结束日期 -->
+                                        <td class="py-3.5 px-5 text-gray-500 text-xs">
+                                            <?= htmlspecialchars($movie['end_date']) ?>
+                                        </td>
+                                        <!-- 电影简介 (限制最大宽度并多出部分显示省略号) -->
+                                        <td class="py-3.5 px-5 text-gray-400 text-xs max-w-xs truncate">
+                                            <?= htmlspecialchars($movie['description'] ?: 'No description provided.') ?>
+                                        </td>
+                                        <!-- 操作 -->
+                                        <td class="py-3.5 px-5 text-right">
+                                            <a href="movies-edit.php?id=<?= $movie['id'] ?>" class="inline-flex items-center space-x-1 text-indigo-600 hover:text-indigo-900 font-semibold text-xs transition">
+                                                <i class="fa-solid fa-pen-to-square text-[10px]"></i>
+                                                <span>Edit</span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -163,10 +195,9 @@
     </div>
 
     <!-- ================= 新增电影弹窗 MODAL ================= -->
-    <div id="newHallModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden transition-all duration-300">
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-xl max-w-md w-full m-4 overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="modalContainer">
+    <div id="newMovieModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden transition-all duration-300">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-xl max-w-lg w-full m-4 overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="modalContainer">
             
-            <!-- 头部 -->
             <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
                 <div>
                     <h3 class="text-base font-bold text-gray-900">Add New Movie</h3>
@@ -177,67 +208,77 @@
                 </button>
             </div>
 
-            <!-- 表单主体 -->
+            <!-- 表单提交 -->
             <form action="movies.php" method="POST" class="p-6 space-y-4">
                 
-                <!-- 电影名称 -->
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-1.5">Movie Title</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none text-xs">
-                            <i class="fa-solid fa-clapperboard"></i>
-                        </span>
-                        <input type="text" name="movie_title" required placeholder="e.g., Interstellar" 
-                            class="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-hidden focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Title -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-1.5">Movie Title</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none text-xs">
+                                <i class="fa-solid fa-clapperboard"></i>
+                            </span>
+                            <input type="text" name="title" required placeholder="e.g., Interstellar" 
+                                class="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
+                        </div>
+                    </div>
+                    <!-- Director -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-1.5">Director Name</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none text-xs">
+                                <i class="fa-solid fa-user-gear"></i>
+                            </span>
+                            <input type="text" name="director_name" required placeholder="e.g., Christopher Nolan" 
+                                class="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
+                        </div>
                     </div>
                 </div>
 
-                <!-- 语言与时长（双列并排） -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <!-- Duration -->
+                    <div class="sm:col-span-1">
                         <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-1.5">Duration (Mins)</label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none text-xs">
                                 <i class="fa-regular fa-clock"></i>
                             </span>
                             <input type="number" name="duration" required placeholder="e.g., 120" 
-                                class="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-hidden focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
+                                class="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-1.5">Genre</label>
-                        <select name="genre" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-hidden focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
-                            <option value="action">Action</option>
-                            <option value="scifi">Sci-Fi</option>
-                            <option value="drama">Drama</option>
-                            <option value="comedy">Comedy</option>
-                        </select>
+                    <!-- Release Date -->
+                    <div class="sm:col-span-1">
+                        <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-1.5">Release Date</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none text-xs">
+                                <i class="fa-solid fa-calendar-day"></i>
+                            </span>
+                            <input type="date" name="release_date" required 
+                                class="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
+                        </div>
+                    </div>
+                    <!-- End Date -->
+                    <div class="sm:col-span-1">
+                        <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-1.5">End Date</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none text-xs">
+                                <i class="fa-solid fa-calendar-xmark"></i>
+                            </span>
+                            <input type="date" name="end_date" required 
+                                class="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
+                        </div>
                     </div>
                 </div>
 
-                <!-- 上映日期 -->
+                <!-- Description (取代了原先的分类与状态) -->
                 <div>
-                    <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-1.5">Release Date</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none text-xs">
-                            <i class="fa-solid fa-calendar-day"></i>
-                        </span>
-                        <input type="date" name="release_date" required 
-                            class="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-hidden focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
-                    </div>
+                    <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-1.5">Description</label>
+                    <textarea name="description" rows="3" placeholder="Enter movie synopsis or description here..." 
+                        class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition resize-none"></textarea>
                 </div>
 
-                <!-- 状态选择 -->
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-1.5">Status</label>
-                    <select name="status" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-hidden focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100/50 transition">
-                        <option value="showing">Now Showing</option>
-                        <option value="coming">Coming Soon</option>
-                        <option value="archived">Archived</option>
-                    </select>
-                </div>
-
-                <!-- 底部操作按钮 -->
                 <div class="pt-4 border-t border-gray-100 flex items-center justify-end space-x-3">
                     <button type="button" id="cancelModalBtn" class="px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl text-xs font-semibold hover:bg-gray-50 transition text-center cursor-pointer">
                         Cancel
@@ -247,69 +288,64 @@
                         <span>Add Movie</span>
                     </button>
                 </div>
-
             </form>
         </div>
     </div>
 
-    <!-- 💡 新增：移动端菜单控制 JavaScript -->
+    <!-- JavaScript 交互 -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const openBtn = document.getElementById('openSidebarBtn');
-            const closeBtn = document.getElementById('closeSidebarBtn');
+            // ----- 1. 移动端侧边栏 -----
+            const openSidebarBtn = document.getElementById('openSidebarBtn');
+            const closeSidebarBtn = document.getElementById('closeSidebarBtn');
             const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
 
             function toggleSidebar(isOpen) {
                 if (isOpen) {
                     sidebar.classList.remove('-translate-x-full');
-                    overlay.classList.remove('hidden');
-                    setTimeout(() => overlay.classList.add('opacity-100'), 20);
+                    sidebarOverlay.classList.remove('hidden');
+                    setTimeout(() => sidebarOverlay.classList.add('opacity-100'), 20);
                 } else {
                     sidebar.classList.add('-translate-x-full');
-                    overlay.classList.remove('opacity-100');
-                    setTimeout(() => overlay.classList.add('hidden'), 300);
+                    sidebarOverlay.classList.remove('opacity-100');
+                    setTimeout(() => sidebarOverlay.classList.add('hidden'), 300);
                 }
             }
 
-            openBtn?.addEventListener('click', () => toggleSidebar(true));
-            closeBtn?.addEventListener('click', () => toggleSidebar(false));
-            overlay?.addEventListener('click', () => toggleSidebar(false));
-        });
-    </script>
-    <!-- ================= 交互控制 JavaScript ================= -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const openBtn = document.getElementById('openModalBtn');
-            const closeBtn = document.getElementById('closeModalBtn');
-            const cancelBtn = document.getElementById('cancelModalBtn');
-            const modal = document.getElementById('newHallModal');
-            const container = document.getElementById('modalContainer');
+            openSidebarBtn?.addEventListener('click', () => toggleSidebar(true));
+            closeSidebarBtn?.addEventListener('click', () => toggleSidebar(false));
+            sidebarOverlay?.addEventListener('click', () => toggleSidebar(false));
+
+            // ----- 2. 电影弹窗 -----
+            const openModalBtn = document.getElementById('openModalBtn');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const cancelModalBtn = document.getElementById('cancelModalBtn');
+            const movieModal = document.getElementById('newMovieModal');
+            const modalContainer = document.getElementById('modalContainer');
 
             function openModal() {
-                modal.classList.remove('hidden');
+                movieModal.classList.remove('hidden');
                 setTimeout(() => {
-                    container.classList.remove('scale-95', 'opacity-0');
-                    container.classList.add('scale-100', 'opacity-100');
+                    modalContainer.classList.remove('scale-95', 'opacity-0');
+                    modalContainer.classList.add('scale-100', 'opacity-100');
                 }, 20);
             }
 
             function closeModal() {
-                container.classList.remove('scale-100', 'opacity-100');
-                container.classList.add('scale-95', 'opacity-0');
+                modalContainer.classList.remove('scale-100', 'opacity-100');
+                modalContainer.classList.add('scale-95', 'opacity-0');
                 setTimeout(() => {
-                    modal.classList.add('hidden');
+                    movieModal.classList.add('hidden');
                 }, 300);
             }
 
-            if (openBtn) openBtn.addEventListener('click', openModal);
-            if (closeBtn) closeBtn.addEventListener('click', closeModal);
-            if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+            if (openModalBtn) openModalBtn.addEventListener('click', openModal);
+            if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+            if (cancelModalBtn) cancelModalBtn.addEventListener('click', closeModal);
 
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    closeModal();
-                }
+            movieModal?.addEventListener('click', (e) => {
+                if (e.target === movieModal) closeModal();
             });
         });
     </script>
